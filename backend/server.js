@@ -1,10 +1,16 @@
 const express = require('express');
-require('dotenv').config();
 const { errorHandler } = require('./middleware/errorMiddleware');
+require('dotenv').config();
+require('colors');
+
+const connectDB = require('./config/db');
 
 // Init app
 const app = express();
 const port = process.env.PORT || 5000;
+
+// Connect to database
+connectDB();
 
 // Middleware
 app.use(express.json()); // {"name": "John Doe", age: 25}
