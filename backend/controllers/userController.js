@@ -2,6 +2,7 @@
 const { validationResult } = require('express-validator');
 const asyncHandler = require('express-async-handler');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 const User = require('../models/userModel');
 
@@ -50,7 +51,7 @@ const registerUser = asyncHandler(async (req, res) => {
       _id: user.id,
       name: user.name,
       email: user.email,
-      // @TODO token
+      token: generateToken(user.id),
     });
   } else {
     res.status(400);
@@ -81,7 +82,7 @@ const loginUser = asyncHandler(async (req, res) => {
       _id: user.id,
       name: user.name,
       email: user.email,
-      // @TODO token
+      token: generateToken(user.id),
     });
   } else {
     res.status(400);
@@ -95,6 +96,9 @@ const loginUser = asyncHandler(async (req, res) => {
  * @access Private
  */
 const getMe = asyncHandler(async (req, res) => {});
+
+const generateToken = id =>
+  jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '30d' });
 
 module.exports = {
   registerUser,
