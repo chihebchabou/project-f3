@@ -1,6 +1,8 @@
 // Dependencies
 const { validationResult } = require('express-validator');
 
+const User = require('../models/userModel');
+
 /**
  * @route POST /api/users
  * @desc Register new user
