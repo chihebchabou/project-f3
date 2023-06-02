@@ -1,5 +1,7 @@
 // Dependencies
 const { validationResult } = require('express-validator');
+const asyncHandler = require('express-async-handler');
+const bcrypt = require('bcryptjs');
 
 const User = require('../models/userModel');
 
@@ -8,7 +10,8 @@ const User = require('../models/userModel');
  * @desc Register new user
  * @access Public
  */
-const registerUser = (req, res) => {
+const registerUser = asyncHandler(async (req, res) => {
+  // Validate request bady data
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     res.status(400);
@@ -20,12 +23,78 @@ const registerUser = (req, res) => {
     );
   }
 
-  res.status(201).send('User created');
-};
+  // Get user data from request body
+  const { name, email, password } = req.body;
 
-const loginUser = (req, res) => {};
+  // Check if user exists
+  const userExists = await User.findOne({ email });
 
-const getMe = (req, res) => {};
+  if (userExists) {
+    res.status(400);
+    throw new Error('User already exists');
+  }
+
+  // Hash password
+  // docs: https://www.npmjs.com/package/bcryptjs
+  const salt = await bcrypt.genSalt(10);
+  //   console.log('salt:', salt);
+
+  const hashedPassword = await bcrypt.hash(password, salt);
+  //   console.log(hashedPassword);
+
+  // Create user
+  const user = await User.create({ name, email, password: hashedPassword });
+
+  if (user) {
+    res.status(201).json({
+      _id: user.id,
+      name: user.name,
+      email: user.email,
+      // @TODO token
+    });
+  } else {
+    res.status(400);
+    throw new Error('Invalid user data');
+  }
+});
+
+/**
+ * @route POST /api/users/login
+ * @desc Authenticate new user
+ * @access Public
+ */
+const loginUser = asyncHandler(async (req, res) => {
+  // Get user data from request body
+  const { email, password } = req.body;
+
+  // Check if user exists
+  const user = await User.findOne({ email });
+
+  if (
+    user &&
+    (await bcrypt.compare(
+      typeof password === 'undefined' ? '' : password,
+      user.password
+    ))
+  ) {
+    res.status(200).json({
+      _id: user.id,
+      name: user.name,
+      email: user.email,
+      // @TODO token
+    });
+  } else {
+    res.status(400);
+    throw new Error('Invalid credentials');
+  }
+});
+
+/**
+ * @route GET /api/users/me
+ * @desc Get user data
+ * @access Private
+ */
+const getMe = asyncHandler(async (req, res) => {});
 
 module.exports = {
   registerUser,
