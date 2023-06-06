@@ -9,8 +9,7 @@ const Contact = require('../models/contactModel');
  * @access Private
  */
 const getContacts = asyncHandler(async (req, res) => {
-  // @TODO make sure to get only contacts of the authenticated user
-  const contacts = await Contact.find();
+  const contacts = await Contact.find({ user: req.user.id });
   res.status(200).json(contacts);
 });
 
@@ -36,10 +35,22 @@ const setContact = asyncHandler(async (req, res) => {
     );
   }
 
+  // Check if user exists
+  if (!req.user) {
+    res.status(401);
+    throw new Error('User not found');
+  }
+
   // Get data from request body
   const { name, email, phone, type } = req.body;
 
-  const contact = await Contact.create({ name, email, phone, type });
+  const contact = await Contact.create({
+    name,
+    email,
+    phone,
+    type,
+    user: req.user.id,
+  });
   res.status(201).json(contact);
 });
 
@@ -56,6 +67,18 @@ const updateContact = asyncHandler(async (req, res) => {
   if (!contact) {
     res.status(400);
     throw new Error('Contact not found');
+  }
+
+  // Check if user exists
+  if (!req.user) {
+    res.status(401);
+    throw new Error('User not found');
+  }
+
+  // Make sure that the logged in user matches the contact user
+  if (contact.user.toString() !== req.user.id) {
+    res.status(401);
+    throw new Error('User not authorized');
   }
 
   // Update the contact
@@ -81,6 +104,18 @@ const deleteContact = asyncHandler(async (req, res) => {
   if (!contact) {
     res.status(400);
     throw new Error('Contact not found');
+  }
+
+  // Check if user exists
+  if (!req.user) {
+    res.status(401);
+    throw new Error('User not found');
+  }
+
+  // Make sure that the logged in user matches the contact user
+  if (contact.user.toString() !== req.user.id) {
+    res.status(401);
+    throw new Error('User not authorized');
   }
 
   await Contact.findByIdAndRemove(req.params.id);

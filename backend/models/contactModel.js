@@ -3,7 +3,11 @@ const mongoose = require('mongoose');
 // Contact Schema
 const contactSchema = new mongoose.Schema(
   {
-    // @todo add user ref
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: 'User',
+    },
     name: {
       type: String,
       required: true,
