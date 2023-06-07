@@ -18,7 +18,7 @@ const Register = () => {
   const onSubmit = e => {
     e.preventDefault();
     if (password !== password2) {
-      toast.error('Password do not match');
+      toast.error('Passwords do not match');
     } else {
       return;
     }
