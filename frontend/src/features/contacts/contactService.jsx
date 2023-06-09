@@ -15,6 +15,16 @@ const createContact = async (contactData, token) => {
 };
 
 // Get user contacts service
+const getContacts = async token => {
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+
+  const response = await axios.get(API_URL, config);
+  return response.data;
+};
 
 // Update users contact service
 
@@ -22,6 +32,7 @@ const createContact = async (contactData, token) => {
 
 const contactService = {
   createContact,
+  getContacts,
 };
 
 export default contactService;
