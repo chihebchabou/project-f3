@@ -1,7 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 
-import { createContact, unsetCurrent } from '../features/contacts/contactSlice';
+import {
+  createContact,
+  updateContact,
+  unsetCurrent,
+} from '../features/contacts/contactSlice';
 
 const ContactForm = () => {
   const [contact, setContact] = useState({
@@ -21,7 +25,12 @@ const ContactForm = () => {
 
   const onSubmit = e => {
     e.preventDefault();
-    dispatch(createContact(contact));
+    if (current !== null) {
+      dispatch(updateContact(contact));
+      dispatch(unsetCurrent());
+    } else {
+      dispatch(createContact(contact));
+    }
   };
 
   const onUnsetCurrent = () => dispatch(unsetCurrent());
