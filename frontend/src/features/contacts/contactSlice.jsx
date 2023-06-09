@@ -65,6 +65,24 @@ export const updateContact = createAsyncThunk(
   }
 );
 
+// Delete users contact
+export const deleteContact = createAsyncThunk(
+  'contact/delete',
+  async (id, thunkAPI) => {
+    try {
+      const token = thunkAPI.getState().auth.user.token;
+      return await contactService.deleteContact(id, token);
+    } catch (error) {
+      console.log(error);
+      const message =
+        (error.message && error.response.data && error.response.data.message) ||
+        error.message ||
+        error.toString();
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
 export const contactSlice = createSlice({
   name: 'contact',
   initialState,
@@ -116,6 +134,21 @@ export const contactSlice = createSlice({
         );
       })
       .addCase(updateContact.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload;
+      })
+      .addCase(deleteContact.pending, state => {
+        state.isLoading = true;
+      })
+      .addCase(deleteContact.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        state.contacts = state.contacts.filter(
+          contact => contact._id !== action.payload.id
+        );
+      })
+      .addCase(deleteContact.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
         state.message = action.payload;

@@ -43,11 +43,25 @@ const updateContact = async (contactData, token) => {
 };
 
 // Delete users contact service
+const deleteContact = async (id, token) => {
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+
+  const response = await axios.delete(
+    API_URL + id,
+    config
+  );
+  return response.data;
+};
 
 const contactService = {
   createContact,
   getContacts,
   updateContact,
+  deleteContact
 };
 
 export default contactService;
