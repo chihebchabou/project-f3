@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 
-import { createContact } from '../features/contacts/contactSlice';
+import { createContact, unsetCurrent } from '../features/contacts/contactSlice';
 
 const ContactForm = () => {
   const [contact, setContact] = useState({
@@ -12,6 +12,7 @@ const ContactForm = () => {
   });
 
   const { name, email, phone, type } = contact;
+  const { current } = useSelector(state => state.contact);
 
   const dispatch = useDispatch();
 
@@ -23,9 +24,19 @@ const ContactForm = () => {
     dispatch(createContact(contact));
   };
 
+  const onUnsetCurrent = () => dispatch(unsetCurrent());
+
+  useEffect(() => {
+    if (current !== null) {
+      setContact(current);
+    } else {
+      setContact({ name: '', email: '', phone: '', type: 'personal' });
+    }
+  }, [current]);
+
   return (
     <form onSubmit={onSubmit}>
-      <h2>Add Contact</h2>
+      <h2>{current ? 'Update' : 'Add'} Contact</h2>
       <div className="mb-3">
         <label htmlFor="name" className="form-label">
           Name
@@ -89,9 +100,20 @@ const ContactForm = () => {
       </div>
       <div className="d-grid gap-2 mb-3">
         <button type="submit" className="btn btn-primary">
-          Add Contact
+          {current ? 'Update' : 'Add'} Contact
         </button>
       </div>
+      {current && (
+        <div className="d-grid gap-2 mb-3">
+          <button
+            type="button"
+            className="btn btn-light"
+            onClick={onUnsetCurrent}
+          >
+            Clear
+          </button>
+        </div>
+      )}
     </form>
   );
 };

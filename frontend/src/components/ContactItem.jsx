@@ -1,9 +1,13 @@
 import { FaEnvelopeOpen, FaPhone } from 'react-icons/fa';
 import { useDispatch } from 'react-redux';
 
+import { setCurrent } from '../features/contacts/contactSlice';
+
 const ContactItem = ({ contact }) => {
   const dispatch = useDispatch();
   const { _id, name, email, phone, type, createdAt } = contact;
+
+  const onEdit = e => dispatch(setCurrent(contact));
 
   return (
     <div className="card mt-3" style={{ width: '100%' }}>
@@ -41,7 +45,9 @@ const ContactItem = ({ contact }) => {
             </span>
           )}
         </p>
-        <button className="btn btn-secondary me-3">Edit</button>
+        <button className="btn btn-secondary me-3" onClick={onEdit}>
+          Edit
+        </button>
         <button className="btn btn-danger me-3">Delete</button>
       </div>
     </div>

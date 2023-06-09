@@ -52,6 +52,12 @@ export const contactSlice = createSlice({
   initialState,
   reducers: {
     reset: state => initialState,
+    setCurrent: (state, action) => {
+      state.current = action.payload;
+    },
+    unsetCurrent: state => {
+      state.current = null;
+    },
   },
   extraReducers: builder => {
     builder
@@ -84,5 +90,5 @@ export const contactSlice = createSlice({
   },
 });
 
-export const { reset } = contactSlice.actions;
+export const { reset, setCurrent, unsetCurrent } = contactSlice.actions;
 export default contactSlice.reducer;
